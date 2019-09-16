@@ -7,7 +7,8 @@ class App extends Component {
   constructor(props) {
     super(props);
       this.state = {
-        selectedFile: null
+        selectedFile: null,
+        loaded: 0
       }
   };
 
@@ -25,12 +26,12 @@ class App extends Component {
     const data = new FormData() 
     data.append('file', this.state.selectedFile);
 
-    axios.post("http://localhost:8000/upload", data, { 
+    axios.post("http://localhost:3001/upload", data, { 
       // receive two parameter endpoint url ,form data 
 
       })
       .then(res => { // then print response status
-        console.log('I am here in response');
+        console.log('I am your Node Server..! (-.-) : 3001');
         console.log(res.statusText);
     })
   };

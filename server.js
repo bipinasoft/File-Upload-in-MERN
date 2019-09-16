@@ -1,28 +1,40 @@
-const express = require('express');
-const multer = require('multer');
-const cors = require('cors');
-const app = express();
-app.use(express.static('public'))
+var express = require('express');
+var app = express();
+var multer = require('multer')
+var cors = require('cors');
+app.use(cors())
+
 var storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'public/images/uploads')
+    destination: function (req, file, cb) {
+      cb(null, 'public/images/uploaded')
     },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + '-' + file.originalname)
+    filename: function (req, file, cb) {
+      cb(null, Date.now() + '-' +file.originalname )
     }
-});
-const upload = multer({
-    storage
+  })
+  
+var upload = multer({ storage: storage }).array('file')
+  
+app.get('/',function(req,res){
+    return res.send('Hello Server')
 })
-app.use(cors());
-app.post('/upload', upload.single('image'), (req, res) => {
-    if (req.file)
-        res.json({
-            imageUrl: `images/uploads/${req.file.filename}`
-        });
-    else
-        res.status("409").json("No Files to Upload.");
+app.post('/upload',function(req, res) {
+    
+    upload(req, res, function (err) {
+     
+        if (err instanceof multer.MulterError) {
+            return res.status(500).json(err)
+          // A Multer error occurred when uploading.
+        } else if (err) {
+            return res.status(500).json(err)
+          // An unknown error occurred when uploading.
+        } 
+        
+        return res.status(200).send(req.file)
+        // Everything went fine.
+      })
 });
-const PORT = 5000;
-app.listen(PORT);
-console.log('api runnging on port: ' + PORT);
+
+app.listen(3001, function() {
+    console.log('App running on port 3001');
+});
